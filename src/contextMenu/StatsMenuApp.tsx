@@ -136,67 +136,84 @@ export default function StatsMenuApp({
     </div>
   );
 
-  const StatsMenu: JSX.Element = (
-    <div
-      className={
-        "grid grid-cols-4 rounded-lg bg-mirage-950/[0.07] fill-text-secondary p-1 py-1 dark:bg-mirage-50/[0.07] dark:fill-text-secondary-dark"
-      }
-    >
-      <div className="col-span-2 grid grid-cols-1 grid-rows-[12px_1fr_12px] justify-items-center gap-y-[1px]">
-        <h2 className="col-span-2 flex justify-center self-start text-2xs font-medium tracking-wider text-text-secondary dark:text-text-secondary-dark">
-          HIT POINTS
-        </h2>
-        <BarInput
-          parentValue={token.health}
-          parentMax={token.maxHealth}
-          color={"RED"}
-          valueUpdateHandler={async (target) =>
-            handleStatUpdate(target, token.health)
-          }
-          maxUpdateHandler={async (target) =>
-            handleStatUpdate(target, token.maxHealth)
-          }
-          valueName="health"
-          maxName="maxHealth"
-          animateOnlyWhenRootActive={true}
-        ></BarInput>
-        <h2 className="col-span-2 flex justify-center self-start text-2xs font-medium tracking-wider text-text-secondary dark:text-text-secondary-dark">
-          & MAXIMUM
-        </h2>
-      </div>
+  const healthRows = [
+    {
+      label: "HP 1",
+      health: token.health,
+      maxHealth: token.maxHealth,
+      healthName: "health" as const,
+      maxHealthName: "maxHealth" as const,
+    },
+    {
+      label: "HP 2",
+      health: token.health2,
+      maxHealth: token.maxHealth2,
+      healthName: "health2" as const,
+      maxHealthName: "maxHealth2" as const,
+    },
+    {
+      label: "HP 3",
+      health: token.health3,
+      maxHealth: token.maxHealth3,
+      healthName: "health3" as const,
+      maxHealthName: "maxHealth3" as const,
+    },
+  ];
 
-      <div className="col-start-3 row-start-1 flex items-center justify-center">
-        <div className="size-0">
-          <TextRing
-            topText={"TEMPORARY"}
-            bottomText={"HIT POINTS"}
-            letterSpacing={0.8}
+  const StatsMenu: JSX.Element = (
+    <div className="rounded-lg bg-mirage-950/[0.07] fill-text-secondary p-2 dark:bg-mirage-50/[0.07] dark:fill-text-secondary-dark">
+      <div className="grid grid-cols-[auto,1fr] items-center gap-x-2 gap-y-1">
+        {healthRows.map((row) => (
+          <div className="contents" key={row.label}>
+            <h2 className="w-9 text-center text-2xs font-medium tracking-wider text-text-secondary dark:text-text-secondary-dark">
+              {row.label}
+            </h2>
+            <BarInput
+              parentValue={row.health}
+              parentMax={row.maxHealth}
+              color={"RED"}
+              valueUpdateHandler={async (target) =>
+                handleStatUpdate(target, row.health)
+              }
+              maxUpdateHandler={async (target) =>
+                handleStatUpdate(target, row.maxHealth)
+              }
+              valueName={row.healthName}
+              maxName={row.maxHealthName}
+              animateOnlyWhenRootActive={true}
+            ></BarInput>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 grid grid-cols-2 place-items-center gap-2">
+        <div className="grid justify-items-center gap-1">
+          <h2 className="text-center text-2xs font-medium tracking-wider text-text-secondary dark:text-text-secondary-dark">
+            TEMP HP
+          </h2>
+          <BubbleInput
+            parentValue={token.tempHealth}
+            color="GREEN"
+            updateHandler={(target) =>
+              handleStatUpdate(target, token.tempHealth)
+            }
+            name="tempHealth"
+            animateOnlyWhenRootActive={true}
           />
         </div>
-      </div>
-      <div className="col-start-3 row-start-1 flex size-full items-center justify-center">
-        <BubbleInput
-          parentValue={token.tempHealth}
-          color="GREEN"
-          updateHandler={(target) => handleStatUpdate(target, token.tempHealth)}
-          name="tempHealth"
-          animateOnlyWhenRootActive={true}
-        />
-      </div>
-
-      <div className="col-start-4 row-start-1 flex items-center justify-center">
-        <div className="size-0">
-          <TextRing topText={"ARMOR"} bottomText={"CLASS"} letterSpacing={1} />
+        <div className="grid justify-items-center gap-1">
+          <h2 className="text-center text-2xs font-medium tracking-wider text-text-secondary dark:text-text-secondary-dark">
+            AC
+          </h2>
+          <BubbleInput
+            parentValue={token.armorClass}
+            color="BLUE"
+            updateHandler={(target) =>
+              handleStatUpdate(target, token.armorClass)
+            }
+            name={"armorClass"}
+            animateOnlyWhenRootActive={true}
+          />
         </div>
-      </div>
-      <div className="col-start-4 row-start-1 flex size-full items-center justify-center">
-        <BubbleInput
-          parentValue={token.armorClass}
-          color="BLUE"
-          updateHandler={(target) => handleStatUpdate(target, token.armorClass)}
-          name={"armorClass"}
-          animateOnlyWhenRootActive={true}
-        />
       </div>
     </div>
   );
@@ -234,60 +251,3 @@ export default function StatsMenuApp({
   );
 }
 
-const TextRing = ({
-  topText,
-  bottomText,
-  letterSpacing,
-}: {
-  topText: string;
-  bottomText: string;
-  letterSpacing: number;
-}): JSX.Element => {
-  const fillOpacity = 0;
-  const radius = 29;
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="overflow-visible text-2xs font-medium"
-    >
-      <path
-        id="topCirclePath"
-        d={`
-          M ${(-radius).toString()} 0
-          A ${radius.toString()} ${radius.toString()} 0 0,1 ${radius.toString()},0
-        `}
-        fillOpacity={fillOpacity}
-      />
-      <path
-        id="bottomCirclePath"
-        d={`
-            M ${(-radius).toString()} 0
-            A ${radius.toString()} ${radius.toString()} 0 0,0 ${radius.toString()},0
-          `}
-        fillOpacity={fillOpacity}
-      />
-      <text>
-        <textPath
-          href="#topCirclePath"
-          startOffset="50%"
-          dominantBaseline="central"
-          textAnchor="middle"
-          letterSpacing={letterSpacing}
-        >
-          {topText}
-        </textPath>
-      </text>
-      <text>
-        <textPath
-          href="#bottomCirclePath"
-          startOffset="50%"
-          dominantBaseline="central"
-          textAnchor="middle"
-          letterSpacing={letterSpacing}
-        >
-          {bottomText}
-        </textPath>
-      </text>
-    </svg>
-  );
-};

@@ -2,8 +2,14 @@ import OBR, { isImage, Item } from "@owlbear-rodeo/sdk";
 
 import {
   HEALTH_METADATA_ID,
+  HEALTH_2_METADATA_ID,
+  HEALTH_3_METADATA_ID,
   MAX_HEALTH_METADATA_ID,
+  MAX_HEALTH_2_METADATA_ID,
+  MAX_HEALTH_3_METADATA_ID,
   TEMP_HEALTH_METADATA_ID,
+  TEMP_HEALTH_2_METADATA_ID,
+  TEMP_HEALTH_3_METADATA_ID,
   ARMOR_CLASS_METADATA_ID,
   HIDE_METADATA_ID,
   GROUP_METADATA_ID,
@@ -37,6 +43,12 @@ export function parseItems(items: Item[]): Token[] {
         readNumberFromObject(metadata, HEALTH_METADATA_ID),
         readNumberFromObject(metadata, MAX_HEALTH_METADATA_ID),
         readNumberFromObject(metadata, TEMP_HEALTH_METADATA_ID),
+        readNumberFromObject(metadata, HEALTH_2_METADATA_ID),
+        readNumberFromObject(metadata, MAX_HEALTH_2_METADATA_ID),
+        readNumberFromObject(metadata, TEMP_HEALTH_2_METADATA_ID),
+        readNumberFromObject(metadata, HEALTH_3_METADATA_ID),
+        readNumberFromObject(metadata, MAX_HEALTH_3_METADATA_ID),
+        readNumberFromObject(metadata, TEMP_HEALTH_3_METADATA_ID),
         readNumberFromObject(metadata, ARMOR_CLASS_METADATA_ID),
         readBooleanFromObject(metadata, HIDE_METADATA_ID),
         readNumberFromObject(metadata, GROUP_METADATA_ID),
@@ -55,23 +67,29 @@ export function itemFilter(item: Item) {
   );
 }
 
-export function getTokenStats(
-  item: Item,
-): [
-  health: number,
-  maxHealth: number,
-  tempHealth: number,
-  armorClass: number,
-  statsVisible: boolean,
-] {
+export function getTokenStats(item: Item) {
   const metadata = getPluginMetadata(item.metadata);
-  return [
-    readNumberFromObject(metadata, HEALTH_METADATA_ID),
-    readNumberFromObject(metadata, MAX_HEALTH_METADATA_ID),
-    readNumberFromObject(metadata, TEMP_HEALTH_METADATA_ID),
-    readNumberFromObject(metadata, ARMOR_CLASS_METADATA_ID),
-    !readBooleanFromObject(metadata, HIDE_METADATA_ID),
-  ];
+  return {
+    healthBars: [
+      {
+        health: readNumberFromObject(metadata, HEALTH_METADATA_ID),
+        maxHealth: readNumberFromObject(metadata, MAX_HEALTH_METADATA_ID),
+        tempHealth: readNumberFromObject(metadata, TEMP_HEALTH_METADATA_ID),
+      },
+      {
+        health: readNumberFromObject(metadata, HEALTH_2_METADATA_ID),
+        maxHealth: readNumberFromObject(metadata, MAX_HEALTH_2_METADATA_ID),
+        tempHealth: readNumberFromObject(metadata, TEMP_HEALTH_2_METADATA_ID),
+      },
+      {
+        health: readNumberFromObject(metadata, HEALTH_3_METADATA_ID),
+        maxHealth: readNumberFromObject(metadata, MAX_HEALTH_3_METADATA_ID),
+        tempHealth: readNumberFromObject(metadata, TEMP_HEALTH_3_METADATA_ID),
+      },
+    ],
+    armorClass: readNumberFromObject(metadata, ARMOR_CLASS_METADATA_ID),
+    statsVisible: !readBooleanFromObject(metadata, HIDE_METADATA_ID),
+  };
 }
 
 export function tokenFactory(
@@ -79,6 +97,12 @@ export function tokenFactory(
   health: number,
   maxHealth: number,
   tempHealth: number,
+  health2: number,
+  maxHealth2: number,
+  tempHealth2: number,
+  health3: number,
+  maxHealth3: number,
+  tempHealth3: number,
   armorClass: number,
   hideStats: boolean,
   group: number,
@@ -89,6 +113,12 @@ export function tokenFactory(
     health,
     maxHealth,
     tempHealth,
+    health2,
+    maxHealth2,
+    tempHealth2,
+    health3,
+    maxHealth3,
+    tempHealth3,
     armorClass,
     hideStats,
     group,

@@ -107,6 +107,9 @@ export function createHealthBar(
   origin: { x: number; y: number },
   variant: "full" | "short" = "full",
   segments = 0,
+  barIndex = 1,
+  yOffset = 0,
+  fillColor = "red",
 ): Item[] {
   let barHeight: number;
   if (variant === "short") {
@@ -116,7 +119,7 @@ export function createHealthBar(
   }
   const position = {
     x: origin.x - bounds.width / 2 + BAR_PADDING,
-    y: origin.y - barHeight - 2,
+    y: origin.y - barHeight - 2 - yOffset,
   };
   const barWidth = bounds.width - BAR_PADDING * 2;
   const barTextHeight = barHeight + 0;
@@ -135,7 +138,7 @@ export function createHealthBar(
     .attachedTo(item.id)
     .layer("ATTACHMENT")
     .locked(LOCKED)
-    .id(hpBackgroundId(item.id))
+    .id(hpBackgroundId(item.id, barIndex))
     .visible(setVisibilityProperty)
     .disableAttachmentBehavior(DISABLE_ATTACHMENT_BEHAVIORS)
     .disableHit(DISABLE_HIT)
@@ -148,7 +151,7 @@ export function createHealthBar(
   const healthFillPortion = getFillPortion(health, maxHealth, segments);
 
   const fillShape = buildCurve()
-    .fillColor("red")
+    .fillColor(fillColor)
     .fillOpacity(HEALTH_OPACITY)
     .zIndex(20000)
     .position({ x: position.x, y: position.y })
@@ -157,7 +160,7 @@ export function createHealthBar(
     .attachedTo(item.id)
     .layer("ATTACHMENT")
     .locked(LOCKED)
-    .id(hpFillId(item.id))
+    .id(hpFillId(item.id, barIndex))
     .visible(setVisibilityProperty)
     .disableAttachmentBehavior(DISABLE_ATTACHMENT_BEHAVIORS)
     .disableHit(DISABLE_HIT)
@@ -193,7 +196,7 @@ export function createHealthBar(
     .layer("TEXT")
     .lineHeight(LINE_HEIGHT)
     .locked(LOCKED)
-    .id(hpTextId(item.id))
+    .id(hpTextId(item.id, barIndex))
     .visible(setVisibilityProperty)
     .disableAttachmentBehavior(DISABLE_ATTACHMENT_BEHAVIORS)
     .disableHit(DISABLE_HIT)
@@ -243,9 +246,14 @@ export function createNameTag(
 // Item Ids
 export const getNameTagId = (itemId: string) => `${itemId}-name-tag`;
 
-export const hpTextId = (itemId: string) => `${itemId}-health-text`;
-export const hpFillId = (itemId: string) => `${itemId}-health-fill`;
-export const hpBackgroundId = (itemId: string) => `${itemId}-health-background`;
+const hpSuffix = (barIndex: number) =>
+  barIndex === 1 ? "" : `-${barIndex.toString()}`;
+export const hpTextId = (itemId: string, barIndex = 1) =>
+  `${itemId}-health${hpSuffix(barIndex)}-text`;
+export const hpFillId = (itemId: string, barIndex = 1) =>
+  `${itemId}-health${hpSuffix(barIndex)}-fill`;
+export const hpBackgroundId = (itemId: string, barIndex = 1) =>
+  `${itemId}-health${hpSuffix(barIndex)}-background`;
 
 export const acTextId = (itemId: string) => `${itemId}-ac-text`;
 export const acBackgroundId = (itemId: string) => `${itemId}-ac-background`;
@@ -266,7 +274,13 @@ export function addAllExtensionAttachmentsToArray(
 }
 
 export function addHealthAttachmentsToArray(array: any[], itemId: string) {
-  array.push(hpTextId(itemId), hpFillId(itemId), hpBackgroundId(itemId));
+  for (const barIndex of [1, 2, 3]) {
+    array.push(
+      hpTextId(itemId, barIndex),
+      hpFillId(itemId, barIndex),
+      hpBackgroundId(itemId, barIndex),
+    );
+  }
 }
 
 export function addArmorAttachmentsToArray(array: any[], itemId: string) {

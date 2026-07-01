@@ -2,10 +2,16 @@ import OBR from "@owlbear-rodeo/sdk";
 import { getPluginId } from "./getPluginId";
 import {
   ARMOR_CLASS_METADATA_ID,
+  HEALTH_2_METADATA_ID,
+  HEALTH_3_METADATA_ID,
   HEALTH_METADATA_ID,
   HIDE_METADATA_ID,
+  MAX_HEALTH_2_METADATA_ID,
+  MAX_HEALTH_3_METADATA_ID,
   MAX_HEALTH_METADATA_ID,
   StatMetadataID,
+  TEMP_HEALTH_2_METADATA_ID,
+  TEMP_HEALTH_3_METADATA_ID,
   TEMP_HEALTH_METADATA_ID,
 } from "./metadataHelpers/itemMetadataIds";
 
@@ -13,6 +19,12 @@ export type InputName =
   | "health"
   | "maxHealth"
   | "tempHealth"
+  | "health2"
+  | "maxHealth2"
+  | "tempHealth2"
+  | "health3"
+  | "maxHealth3"
+  | "tempHealth3"
   | "armorClass"
   | "hideStats";
 
@@ -20,6 +32,12 @@ const inputNames: InputName[] = [
   "health",
   "maxHealth",
   "tempHealth",
+  "health2",
+  "maxHealth2",
+  "tempHealth2",
+  "health3",
+  "maxHealth3",
+  "tempHealth3",
   "armorClass",
   "hideStats",
 ];
@@ -78,6 +96,10 @@ function restrictValueRange(id: StatMetadataID, value: number): number {
   switch (id) {
     case HEALTH_METADATA_ID:
     case MAX_HEALTH_METADATA_ID:
+    case HEALTH_2_METADATA_ID:
+    case MAX_HEALTH_2_METADATA_ID:
+    case HEALTH_3_METADATA_ID:
+    case MAX_HEALTH_3_METADATA_ID:
       if (value > 9999) {
         value = 9999;
       } else if (value < -999) {
@@ -85,6 +107,8 @@ function restrictValueRange(id: StatMetadataID, value: number): number {
       }
       break;
     case TEMP_HEALTH_METADATA_ID:
+    case TEMP_HEALTH_2_METADATA_ID:
+    case TEMP_HEALTH_3_METADATA_ID:
     case ARMOR_CLASS_METADATA_ID:
       if (value > 999) {
         value = 999;
@@ -106,6 +130,18 @@ function convertInputNameToMetadataId(id: InputName): StatMetadataID {
       return MAX_HEALTH_METADATA_ID;
     case "tempHealth":
       return TEMP_HEALTH_METADATA_ID;
+    case "health2":
+      return HEALTH_2_METADATA_ID;
+    case "maxHealth2":
+      return MAX_HEALTH_2_METADATA_ID;
+    case "tempHealth2":
+      return TEMP_HEALTH_2_METADATA_ID;
+    case "health3":
+      return HEALTH_3_METADATA_ID;
+    case "maxHealth3":
+      return MAX_HEALTH_3_METADATA_ID;
+    case "tempHealth3":
+      return TEMP_HEALTH_3_METADATA_ID;
     case "armorClass":
       return ARMOR_CLASS_METADATA_ID;
     case "hideStats":

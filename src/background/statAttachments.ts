@@ -13,6 +13,8 @@ import {
   createHealthBar,
   createNameTag,
   createStatBubble,
+  hpBackgroundId,
+  hpFillId,
   hpTextId,
   thpBackgroundId,
   thpTextId,
@@ -233,8 +235,9 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
   const { origin, bounds } = getOriginAndBounds(settings, item, dpi);
 
   // Create stats
-  const [health, maxHealth, tempHealth, armorClass, statsVisible] =
-    getTokenStats(item);
+  const { healthBars, armorClass, statsVisible } = getTokenStats(item);
+  const visibleHealthBars = healthBars.filter((bar) => bar.maxHealth > 0);
+  const firstHealthBar = healthBars[0];
   if (role === "PLAYER" && !statsVisible && !settings.showBars) {
     // Display nothing, explicitly remove all attachments
     addHealthAttachmentsToArray(deleteItemsArray, item.id);
@@ -259,14 +262,16 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
     };
     if (settings.barAtTop) {
       if (
-        maxHealth <= 0 ||
+        visibleHealthBars.length === 0 ||
         (role === "PLAYER" && !statsVisible && !settings.showBars)
       ) {
         nameTagPosition.y = origin.y - 4;
       } else if (role === "PLAYER" && !statsVisible && settings.showBars) {
-        nameTagPosition.y = origin.y - SHORT_BAR_HEIGHT - 4;
+        nameTagPosition.y =
+          origin.y - visibleHealthBars.length * SHORT_BAR_HEIGHT - 4;
       } else {
-        nameTagPosition.y = origin.y - FULL_BAR_HEIGHT - 4;
+        nameTagPosition.y =
+          origin.y - visibleHealthBars.length * FULL_BAR_HEIGHT - 4;
       }
     }
     addItemsArray.push(
@@ -290,24 +295,38 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
     addTempHealthAttachmentsToArray(deleteItemsArray, item.id);
 
     // return early if health bar shouldn't be created
-    if (maxHealth <= 0) {
+    if (visibleHealthBars.length === 0) {
       addHealthAttachmentsToArray(deleteItemsArray, item.id);
       return;
     }
 
     deleteItemsArray.push(`${item.id}health-label`);
-    addItemsArray.push(
-      ...createHealthBar(
-        item,
-        bounds,
-        health,
-        maxHealth,
-        statsVisible,
-        origin,
-        "short",
-        settings.segments,
-      ),
-    );
+    healthBars.forEach((bar, index) => {
+      if (bar.maxHealth <= 0) {
+        deleteItemsArray.push(
+          hpTextId(item.id, index + 1),
+          hpFillId(item.id, index + 1),
+          hpBackgroundId(item.id, index + 1),
+          `${item.id}health-label`,
+        );
+        return;
+      }
+      addItemsArray.push(
+        ...createHealthBar(
+          item,
+          bounds,
+          bar.health,
+          bar.maxHealth,
+          statsVisible,
+          origin,
+          "short",
+          settings.segments,
+          index + 1,
+          index * SHORT_BAR_HEIGHT,
+          getHealthBarColor(index),
+        ),
+      );
+    });
   }
 
   /**
@@ -316,14 +335,37 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
    */
   function createFullHealthBar() {
     // return early if health bar shouldn't be created
-    if (maxHealth <= 0) {
+    if (visibleHealthBars.length === 0) {
       addHealthAttachmentsToArray(deleteItemsArray, item.id);
       return false;
     }
 
-    addItemsArray.push(
-      ...createHealthBar(item, bounds, health, maxHealth, statsVisible, origin),
-    );
+    healthBars.forEach((bar, index) => {
+      if (bar.maxHealth <= 0) {
+        deleteItemsArray.push(
+          hpTextId(item.id, index + 1),
+          hpFillId(item.id, index + 1),
+          hpBackgroundId(item.id, index + 1),
+          `${item.id}health-label`,
+        );
+        return;
+      }
+      addItemsArray.push(
+        ...createHealthBar(
+          item,
+          bounds,
+          bar.health,
+          bar.maxHealth,
+          statsVisible,
+          origin,
+          "full",
+          settings.segments,
+          index + 1,
+          index * FULL_BAR_HEIGHT,
+          getHealthBarColor(index),
+        ),
+      );
+    });
     return true;
   }
 
@@ -340,7 +382,11 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
 
     const armorPosition = {
       x: origin.x + bounds.width / 2 - DIAMETER / 2 - 2,
-      y: origin.y - DIAMETER / 2 - 4 - (hasHealthBar ? FULL_BAR_HEIGHT : 0),
+      y:
+        origin.y -
+        DIAMETER / 2 -
+        4 -
+        (hasHealthBar ? visibleHealthBars.length * FULL_BAR_HEIGHT : 0),
     };
     if (settings.barAtTop) {
       armorPosition.y = origin.y + DIAMETER / 2;
@@ -368,7 +414,7 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
     hasArmorClassBubble: boolean,
   ) {
     // return early if temp health bubble shouldn't be created
-    if (tempHealth <= 0) {
+    if (firstHealthBar.tempHealth <= 0) {
       addTempHealthAttachmentsToArray(deleteItemsArray, item.id);
       return;
     }
@@ -381,6 +427,11 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
         4,
       y: origin.y - DIAMETER / 2 - 4 - (hasHealthBar ? FULL_BAR_HEIGHT : 0),
     };
+    tempHealthPosition.y =
+      origin.y -
+      DIAMETER / 2 -
+      4 -
+      (hasHealthBar ? visibleHealthBars.length * FULL_BAR_HEIGHT : 0);
     if (settings.barAtTop) {
       tempHealthPosition.y = origin.y + DIAMETER / 2;
     }
@@ -388,7 +439,7 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
     addItemsArray.push(
       ...createStatBubble(
         item,
-        tempHealth,
+        firstHealthBar.tempHealth,
         "olivedrab",
         tempHealthPosition,
         thpBackgroundId(item.id),
@@ -396,6 +447,10 @@ function createAttachments(item: Image, role: "PLAYER" | "GM", dpi: number) {
       ),
     );
   }
+}
+
+function getHealthBarColor(index: number) {
+  return ["red", "darkorange", "mediumseagreen"][index] ?? "red";
 }
 
 async function sendItemsToScene(
