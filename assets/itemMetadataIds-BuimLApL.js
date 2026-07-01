@@ -1,0 +1,1 @@
+const A="health",T="max health",_="temporary health",a="health 2",s="max health 2",D="temporary health 2",E="health 3",t="max health 3",M="temporary health 3",H="armor class",h="hide",o="group",e="index";export{H as A,o as G,A as H,e as I,t as M,_ as T,h as a,M as b,E as c,D as d,s as e,a as f,T as g};

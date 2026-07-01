@@ -1,0 +1,17 @@
+{
+  "name": "Triple Health Bars for D&D",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "author": "Seamus Finlayson, modified for triple health bars",
+  "homepage_url": "https://github.com/NemoCHOU/triple-health-bars-for-owlbear-rodeo",
+  "icon": "/triple-health-bars-for-owlbear-rodeo/logo.png",
+  "background_url": "/triple-health-bars-for-owlbear-rodeo/src/background/background.html",
+  "description": "Three health bars, temporary hit points, and armor class for Owlbear Rodeo tokens.",
+  "action": {
+    "title": "Triple Health Bars for D&D",
+    "icon": "/triple-health-bars-for-owlbear-rodeo/status.svg",
+    "popover": "/triple-health-bars-for-owlbear-rodeo/src/action/action.html",
+    "height": 522,
+    "width": 450
+  }
+}

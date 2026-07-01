@@ -1,0 +1,1 @@
+import{g as u}from"./getPluginId-CM8Yj-eR.js";function i(e,r){return e[u("metadata")]}function s(e,r,t=!1){const a=n(e,r);return typeof a!="boolean"?t:a}function c(e,r,t=0){const a=n(e,r);return typeof a!="number"||Number.isNaN(a)?t:a}function n(e,r){try{return e[r]}catch{return}}export{s as a,i as g,c as r,n as s};
