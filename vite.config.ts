@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  base: "/triple-health-bars-for-owlbear-rodeo/",
   plugins: [react()],
   build: {
     rollupOptions: {
